@@ -1,3 +1,4 @@
+#!/usr/bin/awk
 # make_password.awk - Make random password(s).
 
 # Usage: awk -f make_password.awk [-v num=n] [-v len=n] [-v debug=1]
