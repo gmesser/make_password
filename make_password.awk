@@ -1,4 +1,4 @@
-#!/usr/bin/awk
+#!/usr/bin/awk -f
 # make_password.awk - Make random password(s).
 
 # Usage: awk -f make_password.awk [-v num=n] [-v len=n] [-v debug=1]
@@ -91,9 +91,9 @@ function get_password_characters(pswd_len) {
 	special_candidates="!@#$%^&*-_=+/"
 
 	# Here is where you can set the number of the various candidate characters.
-	lowercase_num = 3
+	lowercase_num = 2
 	uppercase_num = 2
-	numeric_num = 2
+	numeric_num = 3
 	special_num = 1
 
 	# Here is where you can set how the numbers of the various candidate
