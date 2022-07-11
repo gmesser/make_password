@@ -1,31 +1,62 @@
-make_password
-=============
+# make_password
 
-An AWK program to generate a specified number of passwords with from eight to sixteen characters each.
+An AWK program to generate passwords.
 
-Usage: awk -f make_password.awk [-v num=n] [-v len=n] [-v debug=1]
+The default is one password, eight characters long.  
 
-Generates one password by default.
-Use -v num=n on the command line to specify the number of passwords.
-  (num must be >= 1; the default is 1)
+<hr />
 
-Generates eight-character passwords by default.
-Use -v len=n on the command line to specify the length of the passwords. 
-  (len must be >= 8 and <= 16; the default is 8)
+This project provides a shell script and an AWK program.  Use the one you prefer.
 
-A function is provided here that gets a random character from a source 
-string that is not already in a destination string.  It is used in both 
-steps of the password generation.  
+## The Shell Script
 
-The first step is to randomly choose the unique characters that will be 
-in the password.  It does it by choosing characters at random from 
-candidate lowercase, uppercase, numeric, and special characters that have
-not already been chosen. 
+**Usage:** `make_password [-v num=n] [-v len=n] [-v debug=1]`
 
-The second step is to scramble the characters that were chosen.  It does
-that by choosing characters at random from the already-chosen password 
-characters until all of them have been chosen. 
+## The AWK Program
 
-The result of the two steps is a scrambled string containing random, unique
-password characters.
+**Usage:** `awk -f make_password.awk [-v num=n] [-v len=n] [-v debug=1]`
+
+## Number of Passwords
+
+* Use "-v num=***n***" on the command line to specify the number of passwords.<br />(***n*** must be **>= 1**; the default is **1**)
+
+## Password Length
+
+* Use "-v len=***n***" on the command line to specify the length of the passwords.<br />(***n*** must be **>= 8** and **<= 16**; the default is **8**)
+
+## Debug Output
+
+* Use "-v debug=1" on the command line to enable debug messages.<br />The debug messages report parameter errors and also the number of passwords, password length, and number of characters from each group of characters.
+
+<hr />
+
+## Password Candidate Characters
+
+Not all characters are password character candidates.  The generated passwords are sometimes displayed or (horror!) emailed to the user.  Depending on the font used, some characters are indistinguishable from each other.  These characters can lead to user aggravation and completely unnecessary support calls.
+
+In the case of special characters, many of them are problematic for various reasons, and there are plenty of good ones available.
+
+Here are the candidates and exclusions in each group of characters:
+
+* Lowercase Candidates: `abcdefghijkmnpqrstuvwxyz`<br /> Excluded lowercase characters: `l` and `o`.
+* Uppercase Candidates: `ABCDEFGHJKLMNPQRSTUVWXYZ`<br /> Excluded uppercase character: `I` and `O`  
+* Numeric Candidates: `23456789`<br />  Excluded numeric characters: `1` and `0` 
+* Special Character Candidates: `!@#$%^&*-_=+/`
+  <br /> Notable excluded special chacaters: \` `~` `(` `)` `[` `]` `{` `}` `|` `\` `'`  `;` `:` `"` `,` `<` `.` `>` `?`
+
+<hr />
+
+## Methodology
+
+The AWK program includes a function that copies a unique, random character from a source array to a destination array.  The program uses that function in each of the two password generation steps below.  
+
+First it selects the password characters by choosing unique characters at random from the arrays of candidate lowercase, uppercase, numeric, and special characters.
+
+Then it scrambles the password characters by choosing characters at random from the just-chosen array of password characters until all of them have been chosen. 
+
+The result of the two steps is a scrambled string containing unique, random password characters.
+
+**Note:** Everything depends on the random number generator in the AWK interpreter actually being random.  ***If the default random number seed is always the same, all the runs will generate the same sequence of passwords***.  I've only seen that in an old version of a fruit company's OS.  Not in anything current.  Watch out for that, though.  
+
+If your AWK does not generate random passwords, or you're just AWK-curious, try The One True AWK (https://github.com:onetrueawk/awk.git).  That one works perfectly.
 

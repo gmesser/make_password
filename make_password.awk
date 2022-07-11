@@ -30,6 +30,12 @@
 # contain "offensive words".  Visually inspect the generated passwords.
 
 BEGIN {
+    # Seed the random number generator.  
+    # Gnu AWK uses system time by default, like most do.  
+    # This is not specified by POSIX, though, so
+    # check your implementation to make sure the sequence 
+    # of "random" numbers is not repeated from one run to 
+    # the next.
 	srand()
 
 	identification = "make_password"
@@ -42,7 +48,7 @@ BEGIN {
 		if(pswd_num < min_pswd_num) {
 			pswd_num = min_pswd_num
 			if (debug == "1") {
-				printf("%s: An invalid or too-small value for num was specified (%s), defaulted to %d\n", identification, num, pswd_num)
+				printf("%s: Number of passwords was too small (%s), defaulted to %d\n", identification, num, pswd_num)
 			}
 		}
 	}
@@ -56,20 +62,28 @@ BEGIN {
 		if(pswd_len < min_pswd_len) {
 			pswd_len = min_pswd_len
 			if (debug == "1") {
-				printf("%s: An invalid or too-small value for len was specified (%s), defaulted to %d\n", identification, len, pswd_len)
+				printf("%s: Password length was too small (%s), defaulted to %d\n", identification, len, pswd_len)
 			}
 		}
 		if (pswd_len > max_pswd_len) {
 			pswd_len = max_pswd_len
 			if (debug == "1") {
-				printf("%s: A too-large value for len was specified (%s), defaulted to %d\n", identification, len, pswd_len)
+				printf("%s: Password length was too large (%s), defaulted to %d\n", identification, len, pswd_len)
 			}
 		}
 	}
 
 	# Print the password(s).
 	for(pswd_loop = 0; pswd_loop < pswd_num; pswd_loop++) {
-		print generate_password(pswd_len)
+        pswd = generate_password(pswd_len) 
+        if(debug == "1") {
+            printf("generated pswd: ")
+        }
+		printf("%s", pswd)
+        if(debug == "1") {
+            printf(" (length=%d)", length(pswd))
+        }
+        printf("\n")
 	}
 }
 
@@ -84,16 +98,16 @@ function generate_password(pswd_len) {
 function get_password_characters(pswd_len) {
 	# Initialize the candidate password character strings.
 	# (I don't include the I, l, O, o, 1, or 0 characters in the passwords
-	#  because they might be misread, depending on the user's email font.)
+	#  because they might be misread, depending on the user's font.)
 	lowercase_candidates="abcdefghijkmnpqrstuvwxyz"
 	uppercase_candidates="ABCDEFGHJKLMNPQRSTUVWXYZ"
 	numeric_candidates="23456789"
 	special_candidates="!@#$%^&*-_=+/"
 
 	# Here is where you can set the number of the various candidate characters.
-	lowercase_num = 2
+	lowercase_num = 3
 	uppercase_num = 2
-	numeric_num = 3
+	numeric_num = 2
 	special_num = 1
 
 	# Here is where you can set how the numbers of the various candidate
@@ -124,8 +138,8 @@ function get_password_characters(pswd_len) {
 	}
 
 	if (debug == "1") {
-		printf("%s: pswd_len=%d,lowercase_num=%d,uppercase_num=%d,numeric_num=%d,special_num=%d \t",
-			identification, pswd_len, lowercase_num, uppercase_num, numeric_num, special_num)
+		printf("%s: pswd_num=%d,pswd_len=%d,lowercase_num=%d,uppercase_num=%d,numeric_num=%d,special_num=%d \t",
+			identification, pswd_num, pswd_len, lowercase_num, uppercase_num, numeric_num, special_num)
 	}
 
 	# Select and concatenate the password characters.
@@ -136,7 +150,7 @@ function get_password_characters(pswd_len) {
 	p = p get_random_unique_characters(p, special_candidates, special_num)
 	
 	if (debug == "1") {
-		printf("%s(%d) \t", p, length(p))
+		printf("pswd_characters: %s (length=%d) \t", p, length(p))
 	}
 	
 	return p
