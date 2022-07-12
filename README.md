@@ -2,7 +2,7 @@
 
 ## An AWK program to generate passwords.
 
-This project provides a shell script and an AWK program that generates the password.
+This project provides a shell script and an AWK program that generates the passwords.
 
 The default is one password, eight characters long.  
 
@@ -24,7 +24,7 @@ The default is one password, eight characters long.
 
 ### Debug Output - `[-v debug=1]`
 
-* Use "-v debug=1" on the command line to enable debug messages.<br />The debug messages report parameter errors and also the number of passwords, password length, and number of characters from each group of characters.
+* Use "-v debug=1" on the command line to enable debug messages.<br />The debug messages report the number of passwords, password length, and number of characters from each group of characters.
 
 <hr />
 
