@@ -30,57 +30,76 @@
 # contain "offensive words".  Visually inspect the generated passwords.
 
 BEGIN {
+	identification = "make_password"
+	
+    # Was -v debug=n was specified, with n > 0?
+    if(debug != 0) {
+        debug = 1
+    }
+
     # Seed the random number generator.  
     # Gnu AWK uses system time by default, like most do.  
     # This is not specified by POSIX, though, so
     # check your implementation to make sure the sequence 
     # of "random" numbers is not repeated from one run to 
     # the next.
-	srand()
+    # 
+    # Using srand() with the default system time seed allowed me to
+    # run a few executions fast enough that the system time didn't 
+    # change.  This resulted in repeated groups of passwords.
+    #
+    # Calculating the seed using the system time and the last PID fixed it.
+    # Every run generates different passwords.
+    random_seed = calculate_seed()
+    if(debug) {
+        printf("%s: random number seed: %ld\n", identification, random_seed)
+    }
+	srand(random_seed)
 
-	identification = "make_password"
-	
 	# Determine the number of passwords to print.
-	pswd_num = min_pswd_num = 1
+    min_pswd_num = 1
+	pswd_num = default_pswd_num = min_pswd_num
 	if(num != "") {
 		# "-v num=n" was specified on the command line.
 		pswd_num = int(num)
 		if(pswd_num < min_pswd_num) {
-			pswd_num = min_pswd_num
-			if (debug == "1") {
-				printf("%s: Number of passwords was too small (%s), defaulted to %d\n", identification, num, pswd_num)
-			}
+			pswd_num = default_pswd_num
+			printf("%s: Number of passwords specified (%s) was less than the minimum number %d; it was set to the default %d\n", 
+                    identification, num, min_pswd_num, pswd_num)
 		}
 	}
 
 	# Determine the length of the passwords to print.
-	pswd_len = min_pswd_len = 8
-	max_pswd_len = 16
+	min_pswd_len = 8
+    max_pswd_len = 16
+	pswd_len = default_pswd_len = min_pswd_len
 	if(len != "") {
 		# "-v len=n" was specified on the command line.
 		pswd_len = int(len)
 		if(pswd_len < min_pswd_len) {
-			pswd_len = min_pswd_len
-			if (debug == "1") {
-				printf("%s: Password length was too small (%s), defaulted to %d\n", identification, len, pswd_len)
-			}
+			pswd_len = default_pswd_len
+			printf("%s: Password length specified (%s) was less than the minimum length %d; it was set to the default %d\n", 
+                    identification, len, min_pswd_len, pswd_len)
 		}
 		if (pswd_len > max_pswd_len) {
-			pswd_len = max_pswd_len
-			if (debug == "1") {
-				printf("%s: Password length was too large (%s), defaulted to %d\n", identification, len, pswd_len)
-			}
+			pswd_len = default_pswd_len
+			printf("%s: Password length specified (%s) was greater than the maximum length %d; it was set to the default %d\n", 
+                    identification, len, max_pswd_len, pswd_len)
 		}
 	}
+
+	if (debug) {
+		printf("%s: pswd_num: %d, pswd_len: %d\n", identification, pswd_num, pswd_len)
+    }
 
 	# Print the password(s).
 	for(pswd_loop = 0; pswd_loop < pswd_num; pswd_loop++) {
         pswd = generate_password(pswd_len) 
-        if(debug == "1") {
-            printf("generated pswd: ")
+        if(debug) {
+            printf("pswd: ")
         }
 		printf("%s", pswd)
-        if(debug == "1") {
+        if(debug) {
             printf(" (length=%d)", length(pswd))
         }
         printf("\n")
@@ -137,9 +156,9 @@ function get_password_characters(pswd_len) {
 		lowercase_num++
 	}
 
-	if (debug == "1") {
-		printf("%s: pswd_num=%d,pswd_len=%d,lowercase_num=%d,uppercase_num=%d,numeric_num=%d,special_num=%d \t",
-			identification, pswd_num, pswd_len, lowercase_num, uppercase_num, numeric_num, special_num)
+	if (debug) {
+		printf("%s: lowercase_num:%d,uppercase_num:%d,numeric_num:%d,special_num:%d, \t",
+			    identification, lowercase_num, uppercase_num, numeric_num, special_num)
 	}
 
 	# Select and concatenate the password characters.
@@ -149,8 +168,8 @@ function get_password_characters(pswd_len) {
 	p = p get_random_unique_characters(p, numeric_candidates, numeric_num)
 	p = p get_random_unique_characters(p, special_candidates, special_num)
 	
-	if (debug == "1") {
-		printf("pswd_characters: %s (length=%d) \t", p, length(p))
+	if (debug) {
+		printf("pswd characters: %s (length=%d) \t", p, length(p))
 	}
 	
 	return p
@@ -210,6 +229,22 @@ function get_random_unique_character(str, possibles) {
 	return ""
 }
 
+function calculate_seed() {
+    cmd = "date +%s"
+    cmd | getline tm
+    close(cmd)
+    cmd2 = "ps -e -o pid | tail -n 1" 
+    cmd2 | getline pid
+    close(cmd2)
+    seed_tm_pid = ((tm + pid) * 3)
+
+    if(debug) {
+        printf("%s: tm: %ld, pid: %ld, ((tm+pid)*3): %ld\n", identification, tm, pid, seed_tm_pid)
+    }
+
+    return(seed_tm_pid)
+}
+
 # Scramble the characters in a string.
 function scramble(str) {
 	# Randomly choose and concatenate characters from str until all have been chosen.
@@ -219,3 +254,5 @@ function scramble(str) {
 	}
 	return scrambled
 }
+
+# end of make_password.awk

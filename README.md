@@ -1,12 +1,10 @@
 # make_password
 
-An AWK program to generate passwords.
+## An AWK program to generate passwords.
+
+This project provides a shell script and an AWK program that generates the password.
 
 The default is one password, eight characters long.  
-
-<hr />
-
-This project provides a shell script and an AWK program.  Use the one you prefer.
 
 ## The Shell Script
 
@@ -16,15 +14,15 @@ This project provides a shell script and an AWK program.  Use the one you prefer
 
 **Usage:** `awk -f make_password.awk [-v num=n] [-v len=n] [-v debug=1]`
 
-## Number of Passwords
+### Number of Passwords - `[-v num=n]`
 
-* Use "-v num=***n***" on the command line to specify the number of passwords.<br />(***n*** must be **>= 1**; the default is **1**)
+* Use "-v num=***n***" on the command line to specify the number of passwords./>(***n*** must be **>= 1**; the default is **1**)
 
-## Password Length
+### Password Length - `[-v len=n]`
 
 * Use "-v len=***n***" on the command line to specify the length of the passwords.<br />(***n*** must be **>= 8** and **<= 16**; the default is **8**)
 
-## Debug Output
+### Debug Output - `[-v debug=1]`
 
 * Use "-v debug=1" on the command line to enable debug messages.<br />The debug messages report parameter errors and also the number of passwords, password length, and number of characters from each group of characters.
 
@@ -34,7 +32,7 @@ This project provides a shell script and an AWK program.  Use the one you prefer
 
 Not all characters are password character candidates.  The generated passwords are sometimes displayed or (horror!) emailed to the user.  Depending on the font used, some characters are indistinguishable from each other.  These characters can lead to user aggravation and completely unnecessary support calls.
 
-In the case of special characters, many of them are problematic for various reasons, and there are plenty of good ones available.
+In the case of special characters, many of them are problematic for various reasons, like inserting into a spreadsheet cell, and there are plenty of other ones available.
 
 Here are the candidates and exclusions in each group of characters:
 
@@ -42,7 +40,7 @@ Here are the candidates and exclusions in each group of characters:
 * Uppercase Candidates: `ABCDEFGHJKLMNPQRSTUVWXYZ`<br /> Excluded uppercase character: `I` and `O`  
 * Numeric Candidates: `23456789`<br />  Excluded numeric characters: `1` and `0` 
 * Special Character Candidates: `!@#$%^&*-_=+/`
-  <br /> Notable excluded special chacaters: \` `~` `(` `)` `[` `]` `{` `}` `|` `\` `'`  `;` `:` `"` `,` `<` `.` `>` `?`
+  Notable excluded special chacaters: `~` `(` `)` `[` `]` `{` `}` `|` `\` `'`  `;` `:` `"` `,` `<` `.` `>` `?`
 
 <hr />
 
@@ -56,7 +54,7 @@ Then it scrambles the password characters by choosing characters at random from 
 
 The result of the two steps is a scrambled string containing unique, random password characters.
 
-**Note:** Everything depends on the random number generator in the AWK interpreter actually being random.  ***If the default random number seed is always the same, all the runs will generate the same sequence of passwords***.  I've only seen that in an old version of a fruit company's OS.  Not in anything current.  Watch out for that, though.  
+**Note:** Everything depends on the random number generator in the AWK interpreter actually being random.  ***If the default random number seed is always the same, all the runs will generate the same sequence of passwords***.  
 
 If your AWK does not generate random passwords, or you're just AWK-curious, try The One True AWK (https://github.com:onetrueawk/awk.git).  That one works perfectly.
 
